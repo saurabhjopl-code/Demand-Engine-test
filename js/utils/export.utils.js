@@ -184,7 +184,7 @@ function flattenDW() {
 }
 
 /* ==============================
-   🚀 SURGE DETECTION
+   🚀 SURGE
 ============================== */
 
 function flattenSurge() {
@@ -194,12 +194,10 @@ function flattenSurge() {
 
   let rows = [...surge.rows];
 
-  // Respect toggle
   if (surge.showOnlyGrowth) {
     rows = rows.filter(r => r.accel > 5);
   }
 
-  // Respect global search
   if (window.globalSearchTerm) {
     rows = rows.filter(r =>
       r.styleId.includes(window.globalSearchTerm)
@@ -212,6 +210,38 @@ function flattenSurge() {
     Previous_DRR: row.previousDRR,
     Current_DRR: row.currentDRR,
     Acceleration_Percent: row.accel,
+    SC: row.sc,
+    Risk: row.risk
+  }));
+}
+
+/* ==============================
+   🛡️ DROP RISK
+============================== */
+
+function flattenDropRisk() {
+
+  const drop = computedStore.reports?.dropRisk;
+  if (!drop || !drop.rows?.length) return [];
+
+  let rows = [...drop.rows];
+
+  if (drop.showOnlyMajor) {
+    rows = rows.filter(r => r.drop > 10);
+  }
+
+  if (window.globalSearchTerm) {
+    rows = rows.filter(r =>
+      r.styleId.includes(window.globalSearchTerm)
+    );
+  }
+
+  return rows.map(row => ({
+    Style: row.styleId,
+    Category: row.category,
+    Previous_DRR: row.previousDRR,
+    Current_DRR: row.currentDRR,
+    Drop_Percent: row.drop,
     SC: row.sc,
     Risk: row.risk
   }));
@@ -232,6 +262,7 @@ export function exportAllReports() {
   XLSX.utils.book_append_sheet(wb, createSheet(flattenHero()), "Hero");
   XLSX.utils.book_append_sheet(wb, createSheet(flattenDW()), "DW");
   XLSX.utils.book_append_sheet(wb, createSheet(flattenSurge()), "Surge");
+  XLSX.utils.book_append_sheet(wb, createSheet(flattenDropRisk()), "DropRisk");
 
   const today = new Date();
   const fileName = `Demand_Planning_Engine_${today.getFullYear()}${String(today.getMonth()+1).padStart(2,"0")}${String(today.getDate()).padStart(2,"0")}.xlsx`;
