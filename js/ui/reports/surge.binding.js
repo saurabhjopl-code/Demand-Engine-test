@@ -12,6 +12,22 @@ function getAccelClass(accel) {
   return "";
 }
 
+function getRiskClass(risk) {
+
+  if (
+    risk === "New Surge" ||
+    risk === "Critical Surge"
+  ) return "risk-red";
+
+  if (risk === "Growing Opportunity")
+    return "risk-orange";
+
+  if (risk === "Early Growth")
+    return "risk-yellow";
+
+  return "";
+}
+
 export function renderSurge() {
 
   const header = document.querySelector(".report-header");
@@ -79,7 +95,9 @@ export function renderSurge() {
           ${formatDecimal(row.accel)}%
         </td>
         <td>${formatDecimal(row.sc)}</td>
-        <td>${row.risk}</td>
+        <td class="${getRiskClass(row.risk)}">
+          ${row.risk}
+        </td>
       </tr>
     `;
   });
@@ -88,7 +106,6 @@ export function renderSurge() {
 
   body.innerHTML = html;
 
-  // Toggle Handler
   document.getElementById("surgeToggle")
     .addEventListener("change", (e) => {
 
