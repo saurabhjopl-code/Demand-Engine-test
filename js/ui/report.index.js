@@ -74,6 +74,10 @@ export function renderAllReports() {
         buildDropRisk();
         renderDropRisk();
       }
+if (tabName === "dead stock") {
+  buildDeadStock("seller");
+  renderDeadStock();
+}
 
     });
 
@@ -83,4 +87,5 @@ export function renderAllReports() {
   const defaultTab = document.querySelector('.tab[data-tab="demand"]');
   if (defaultTab) defaultTab.click();
 }
+
 
