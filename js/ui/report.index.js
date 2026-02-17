@@ -1,3 +1,7 @@
+import { renderSurge } from "./reports/surge.binding.js";
+import { buildSurge } from "../engine/reports/surge.engine.js";
+
+
 import { computedStore } from "../store/computed.store.js";
 
 import { renderDemand } from "./reports/demand.binding.js";
@@ -63,6 +67,10 @@ export function renderAllReports() {
         buildDW();
         renderDW();
       }
+      if (tabName === "surge") {
+        buildSurge();
+        renderSurge();
+      }
 
     });
 
@@ -72,5 +80,6 @@ export function renderAllReports() {
   buildDemand(45, "total");
   renderDemand();
 }
+
 
 
