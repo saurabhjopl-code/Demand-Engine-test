@@ -1,0 +1,76 @@
+import { computedStore } from "../../store/computed.store.js";
+import { applyGlobalSearch } from "../../utils/search.utils.js";
+
+function formatDecimal(num) {
+  return num.toFixed(2);
+}
+
+function getAccelClass(accel) {
+  if (accel > 25) return "text-red";
+  if (accel > 5) return "text-orange";
+  if (accel < -25) return "text-blue";
+  return "";
+}
+
+export function renderSurge() {
+
+  const header = document.querySelector(".report-header");
+  const body = document.querySelector(".report-body");
+
+  const report = computedStore.reports?.surge;
+
+  if (!report || !report.rows.length) {
+    body.innerHTML = "<div style='padding:20px;'>No Surge Data</div>";
+    return;
+  }
+
+  const { rows, currentMonth, previousMonth } = report;
+
+  header.innerHTML = `
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <div>🚀 Surge Detection</div>
+      <div style="font-size:12px; opacity:0.7;">
+        ${previousMonth} → ${currentMonth}
+      </div>
+    </div>
+  `;
+
+  let data = applyGlobalSearch(rows, ["styleId"]);
+
+  let html = `
+    <table class="summary-table">
+      <thead>
+        <tr>
+          <th>Style</th>
+          <th>Category</th>
+          <th>DRR (${previousMonth})</th>
+          <th>DRR (${currentMonth})</th>
+          <th>Accel %</th>
+          <th>SC</th>
+          <th>Risk</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  data.forEach(row => {
+
+    html += `
+      <tr>
+        <td>${row.styleId}</td>
+        <td>${row.category}</td>
+        <td>${formatDecimal(row.previousDRR)}</td>
+        <td>${formatDecimal(row.currentDRR)}</td>
+        <td class="${getAccelClass(row.accel)}">
+          ${formatDecimal(row.accel)}%
+        </td>
+        <td>${formatDecimal(row.sc)}</td>
+        <td>${row.risk}</td>
+      </tr>
+    `;
+  });
+
+  html += "</tbody></table>";
+
+  body.innerHTML = html;
+}
