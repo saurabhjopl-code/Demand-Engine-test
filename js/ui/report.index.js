@@ -31,49 +31,44 @@ export function renderAllReports() {
       tabs.forEach(t => t.classList.remove("active"));
       tab.classList.add("active");
 
-      const tabName = tab.dataset.tab;
+      const tabKey = tab.dataset.tab;
 
-      if (tabName === "demand") {
-        buildDemand(
-          computedStore.reports?.demand?.selectedDays || 45,
-          computedStore.reports?.demand?.stockMode || "total"
-        );
+      if (tabKey === "demand") {
+        buildDemand(45);
         renderDemand();
       }
 
-      if (tabName === "overstock") {
-        buildOverstock(
-          computedStore.reports?.overstock?.threshold || 90
-        );
+      if (tabKey === "overstock") {
+        buildOverstock(90);
         renderOverstock();
       }
 
-      if (tabName === "sizecurve") {
-        buildSizeCurve(
-          computedStore.reports?.sizeCurve?.viewMode || "pending"
-        );
+      if (tabKey === "sizeCurve") {
+        buildSizeCurve(45);
         renderSizeCurve();
       }
 
-      if (tabName === "broken") {
+      if (tabKey === "broken") {
         buildBroken();
         renderBroken();
       }
 
-      if (tabName === "hero") {
+      if (tabKey === "hero") {
         buildHero();
         renderHero();
       }
 
-      if (tabName === "dw") {
+      if (tabKey === "dw") {
         buildDW();
         renderDW();
       }
-      if (tabName === "surge") {
+
+      if (tabKey === "surge") {
         buildSurge();
         renderSurge();
       }
-      if (tabName === "drop risk") {
+
+      if (tabKey === "dropRisk") {
         buildDropRisk();
         renderDropRisk();
       }
@@ -82,11 +77,7 @@ export function renderAllReports() {
 
   });
 
-  // Default load
-  buildDemand(45, "total");
-  renderDemand();
+  // default load
+  const defaultTab = document.querySelector('.tab[data-tab="demand"]');
+  if (defaultTab) defaultTab.click();
 }
-
-
-
-
