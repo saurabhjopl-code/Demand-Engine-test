@@ -1,0 +1,29 @@
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 25px;
+  margin-bottom: 25px;
+}
+
+.summary-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  text-align: center;
+}
+
+.summary-table th,
+.summary-table td {
+  border: 1px solid #e5e7eb;
+  padding: 6px 8px;
+}
+
+.summary-table thead {
+  background: #f1f5f9;
+  font-weight: 600;
+}
+
+.grand-row {
+  background: #e6ecf7;
+  font-weight: 600;
+}
