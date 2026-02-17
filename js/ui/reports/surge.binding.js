@@ -26,16 +26,30 @@ export function renderSurge() {
 
   const { rows, currentMonth, previousMonth } = report;
 
+  const showOnlyGrowth =
+    computedStore.reports?.surge?.showOnlyGrowth || false;
+
   header.innerHTML = `
     <div style="display:flex; justify-content:space-between; align-items:center;">
       <div>🚀 Surge Detection</div>
-      <div style="font-size:12px; opacity:0.7;">
-        ${previousMonth} → ${currentMonth}
+      <div style="display:flex; align-items:center; gap:16px;">
+        <div style="font-size:12px; opacity:0.7;">
+          ${previousMonth} → ${currentMonth}
+        </div>
+        <label style="font-size:13px; display:flex; align-items:center; gap:6px; cursor:pointer;">
+          <input type="checkbox" id="surgeToggle"
+            ${showOnlyGrowth ? "checked" : ""} />
+          Show Only >5%
+        </label>
       </div>
     </div>
   `;
 
   let data = applyGlobalSearch(rows, ["styleId"]);
+
+  if (showOnlyGrowth) {
+    data = data.filter(r => r.accel > 5);
+  }
 
   let html = `
     <table class="summary-table">
@@ -73,4 +87,14 @@ export function renderSurge() {
   html += "</tbody></table>";
 
   body.innerHTML = html;
+
+  // Toggle Handler
+  document.getElementById("surgeToggle")
+    .addEventListener("change", (e) => {
+
+      computedStore.reports.surge.showOnlyGrowth =
+        e.target.checked;
+
+      renderSurge();
+    });
 }
