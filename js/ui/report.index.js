@@ -1,5 +1,7 @@
 import { renderSurge } from "./reports/surge.binding.js";
 import { buildSurge } from "../engine/reports/surge.engine.js";
+import { buildDropRisk } from "../engine/reports/dropRisk.engine.js";
+import { renderDropRisk } from "./reports/dropRisk.binding.js";
 
 
 import { computedStore } from "../store/computed.store.js";
@@ -71,6 +73,10 @@ export function renderAllReports() {
         buildSurge();
         renderSurge();
       }
+      if (tabName === "drop risk") {
+        buildDropRisk();
+        renderDropRisk();
+      }
 
     });
 
@@ -80,6 +86,7 @@ export function renderAllReports() {
   buildDemand(45, "total");
   renderDemand();
 }
+
 
 
 
