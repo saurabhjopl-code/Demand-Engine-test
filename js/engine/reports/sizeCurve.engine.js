@@ -13,68 +13,43 @@ function getTotalSaleDays() {
   }, 0);
 }
 
-function getStyleMeta(styleId) {
-  const row = dataStore.styleStatus.find(
-    r => r["Style ID"] === styleId
-  );
-  return {
-    category: row?.Category || "",
-    remark: row?.["Company Remark"] || ""
-  };
-}
-
-function getStock(styleId, mode) {
-
-  return dataStore.stock
-    .filter(r =>
-      r["Style ID"] === styleId &&
-      (mode === "total"
-        ? true
-        : r.FC === "SELLER")
-    )
-    .reduce((sum, r) => sum + Number(r.Units || 0), 0);
-}
-
-function getProduction(styleId) {
-  return dataStore.production
-    .filter(r => r["Uniware SKU"])
-    .filter(r => {
-      const sku = r["Uniware SKU"];
-      const stockRow = dataStore.stock.find(
-        s => s["Uniware SKU"] === sku &&
-             s["Style ID"] === styleId
-      );
-      return !!stockRow;
-    })
-    .reduce((sum, r) => sum + Number(r["In Production"] || 0), 0);
-}
-
-export function buildSizeCurve(
-  selectedDays = 45,
-  stockMode = "total",
-  demandBasis = "pending"
-) {
+export function buildSizeCurve(selectedDays = 45) {
 
   const totalSaleDays = getTotalSaleDays();
-
   if (!totalSaleDays) {
-    computedStore.reports.sizeCurve = { rows: [] };
+    computedStore.reports.sizeCurve = { rows: [], selectedDays };
     return;
   }
 
-  const styleSet = new Set(
-    dataStore.sales.map(r => r["Style ID"])
-  );
+  /* ===============================
+     Pre-group sales by Style
+  =============================== */
+
+  const salesByStyle = {};
+  dataStore.sales.forEach(r => {
+    const style = r["Style ID"];
+    if (!salesByStyle[style]) salesByStyle[style] = [];
+    salesByStyle[style].push(r);
+  });
+
+  /* ===============================
+     Pre-group SELLER stock by Style
+  =============================== */
+
+  const sellerStockByStyle = {};
+  dataStore.stock
+    .filter(r => r.FC === "SELLER")
+    .forEach(r => {
+      const style = r["Style ID"];
+      if (!sellerStockByStyle[style]) sellerStockByStyle[style] = 0;
+      sellerStockByStyle[style] += Number(r.Units || 0);
+    });
 
   const rows = [];
 
-  styleSet.forEach(styleId => {
+  Object.keys(salesByStyle).forEach(styleId => {
 
-    const meta = getStyleMeta(styleId);
-
-    const styleSalesRows = dataStore.sales.filter(
-      r => r["Style ID"] === styleId
-    );
+    const styleSalesRows = salesByStyle[styleId];
 
     const totalUnits = styleSalesRows.reduce(
       (sum, r) => sum + Number(r.Units || 0),
@@ -83,34 +58,37 @@ export function buildSizeCurve(
 
     if (!totalUnits) return;
 
+    /* ===============================
+       DRR
+    =============================== */
+
     const drr = totalUnits / totalSaleDays;
+
+    /* ===============================
+       Required Demand
+    =============================== */
 
     const required = drr * selectedDays;
 
-    const stock = getStock(styleId, stockMode);
+    /* ===============================
+       Seller Stock
+    =============================== */
 
-    let direct = required - stock;
-    if (direct < 0) direct = 0;
+    const sellerStock = sellerStockByStyle[styleId] || 0;
 
-    const production = getProduction(styleId);
+    /* ===============================
+       Final Demand
+    =============================== */
 
-    let pending = direct - production;
-    if (pending < 0) pending = 0;
+    let demand = required - sellerStock;
+    if (demand <= 0) return; // show only > 0
 
-    let styleDemand = 0;
-
-    if (demandBasis === "required")
-      styleDemand = required;
-    else if (demandBasis === "direct")
-      styleDemand = direct;
-    else
-      styleDemand = pending;
+    /* ===============================
+       Size Mix Allocation
+    =============================== */
 
     const sizeSales = {};
-
-    SIZE_ORDER.forEach(size => {
-      sizeSales[size] = 0;
-    });
+    SIZE_ORDER.forEach(size => sizeSales[size] = 0);
 
     styleSalesRows.forEach(r => {
       const size = r.Size || "FS";
@@ -119,28 +97,27 @@ export function buildSizeCurve(
     });
 
     const sizes = {};
-
     SIZE_ORDER.forEach(size => {
       const share = sizeSales[size] / totalUnits;
-      sizes[size] = Math.round(styleDemand * share);
+      sizes[size] = Math.round(demand * share);
     });
 
     rows.push({
       styleId,
-      category: meta.category,
-      remark: meta.remark,
-      styleDemand: Math.round(styleDemand),
+      styleDemand: Math.round(demand),
       sizes
     });
 
   });
 
+  /* ===============================
+     Sort by Highest Demand
+  =============================== */
+
   rows.sort((a, b) => b.styleDemand - a.styleDemand);
 
   computedStore.reports.sizeCurve = {
     rows,
-    selectedDays,
-    stockMode,
-    demandBasis
+    selectedDays
   };
 }
