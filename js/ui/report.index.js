@@ -2,6 +2,8 @@ import { renderSurge } from "./reports/surge.binding.js";
 import { buildSurge } from "../engine/reports/surge.engine.js";
 import { buildDropRisk } from "../engine/reports/dropRisk.engine.js";
 import { renderDropRisk } from "./reports/dropRisk.binding.js";
+import { renderDeadStock } from "./reports/deadStock.binding.js";
+import { buildDeadStock } from "../engine/reports/deadStock.engine.js";
 
 
 import { computedStore } from "../store/computed.store.js";
@@ -81,3 +83,4 @@ export function renderAllReports() {
   const defaultTab = document.querySelector('.tab[data-tab="demand"]');
   if (defaultTab) defaultTab.click();
 }
+
