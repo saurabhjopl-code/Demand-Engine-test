@@ -4,6 +4,10 @@ function createSheet(dataArray) {
   return XLSX.utils.json_to_sheet(dataArray);
 }
 
+/* ==============================
+   DEMAND
+============================== */
+
 function flattenDemand() {
 
   const data = computedStore.reports?.demand;
@@ -48,6 +52,10 @@ function flattenDemand() {
   return rows;
 }
 
+/* ==============================
+   OVERSTOCK
+============================== */
+
 function flattenOverstock() {
 
   const data = computedStore.reports?.overstock;
@@ -86,6 +94,10 @@ function flattenOverstock() {
   return rows;
 }
 
+/* ==============================
+   SIZE CURVE
+============================== */
+
 function flattenSizeCurve() {
 
   const data = computedStore.reports?.sizeCurve;
@@ -97,6 +109,10 @@ function flattenSizeCurve() {
     ...row.sizes
   }));
 }
+
+/* ==============================
+   BROKEN
+============================== */
 
 function flattenBroken() {
 
@@ -114,6 +130,10 @@ function flattenBroken() {
     Remark: row.remark
   }));
 }
+
+/* ==============================
+   HERO
+============================== */
 
 function flattenHero() {
 
@@ -139,6 +159,10 @@ function flattenHero() {
   }));
 }
 
+/* ==============================
+   DW
+============================== */
+
 function flattenDW() {
 
   const data = computedStore.dw || [];
@@ -159,6 +183,44 @@ function flattenDW() {
   }));
 }
 
+/* ==============================
+   🚀 SURGE DETECTION
+============================== */
+
+function flattenSurge() {
+
+  const surge = computedStore.reports?.surge;
+  if (!surge || !surge.rows?.length) return [];
+
+  let rows = [...surge.rows];
+
+  // Respect toggle
+  if (surge.showOnlyGrowth) {
+    rows = rows.filter(r => r.accel > 5);
+  }
+
+  // Respect global search
+  if (window.globalSearchTerm) {
+    rows = rows.filter(r =>
+      r.styleId.includes(window.globalSearchTerm)
+    );
+  }
+
+  return rows.map(row => ({
+    Style: row.styleId,
+    Category: row.category,
+    Previous_DRR: row.previousDRR,
+    Current_DRR: row.currentDRR,
+    Acceleration_Percent: row.accel,
+    SC: row.sc,
+    Risk: row.risk
+  }));
+}
+
+/* ==============================
+   EXPORT ALL
+============================== */
+
 export function exportAllReports() {
 
   const wb = XLSX.utils.book_new();
@@ -169,6 +231,7 @@ export function exportAllReports() {
   XLSX.utils.book_append_sheet(wb, createSheet(flattenBroken()), "Broken");
   XLSX.utils.book_append_sheet(wb, createSheet(flattenHero()), "Hero");
   XLSX.utils.book_append_sheet(wb, createSheet(flattenDW()), "DW");
+  XLSX.utils.book_append_sheet(wb, createSheet(flattenSurge()), "Surge");
 
   const today = new Date();
   const fileName = `Demand_Planning_Engine_${today.getFullYear()}${String(today.getMonth()+1).padStart(2,"0")}${String(today.getDate()).padStart(2,"0")}.xlsx`;
