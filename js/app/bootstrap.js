@@ -12,21 +12,52 @@ import { exportAllReports } from "../utils/export.utils.js";
 
 window.globalSearchTerm = "";
 
+/* =========================
+   GLOBAL SEARCH
+========================= */
+
 function wireGlobalSearch() {
   const input = document.querySelector(".search-input");
+
   input.addEventListener("input", (e) => {
     window.globalSearchTerm = e.target.value;
-    const activeTab = document.querySelector(".tab.active");
-    if (activeTab) activeTab.click();
+
+    const activeItem = document.querySelector(".sidebar-item.active");
+    if (activeItem) activeItem.click();
   });
 }
 
+/* =========================
+   EXPORT BUTTON
+========================= */
+
 function wireExportButton() {
   const btn = document.querySelector(".btn-primary");
+
   btn.addEventListener("click", () => {
     exportAllReports();
   });
 }
+
+/* =========================
+   SIDEBAR TOGGLE
+========================= */
+
+function wireSidebarToggle() {
+
+  const sidebar = document.getElementById("sidebar");
+  const toggleBtn = document.getElementById("sidebarToggle");
+
+  if (!sidebar || !toggleBtn) return;
+
+  toggleBtn.addEventListener("click", () => {
+    sidebar.classList.toggle("collapsed");
+  });
+}
+
+/* =========================
+   LOAD SHEETS WITH LIVE PROGRESS
+========================= */
 
 async function loadAllSheets() {
 
@@ -36,7 +67,6 @@ async function loadAllSheets() {
   let loaded = 0;
   const total = Object.keys(SHEETS).length;
 
-  // Initialize stats structure
   const sheetCounts = {
     sales: 0,
     stock: 0,
@@ -53,14 +83,12 @@ async function loadAllSheets() {
 
     try {
 
-      // Show currently loading sheet
       progressStats.innerHTML = `Loading: ${key}...`;
 
       const text = await fetchCSV(SHEETS[key]);
       const parsed = parseCSV(text);
 
       dataStore[key] = parsed;
-
       sheetCounts[key] = parsed.length;
 
       loaded++;
@@ -70,7 +98,6 @@ async function loadAllSheets() {
       progressFill.style.width = `${percent}%`;
       progressFill.textContent = `${percent}%`;
 
-      // Update row counts LIVE
       progressStats.innerHTML = `
         Sales: ${sheetCounts.sales} |
         Stock: ${sheetCounts.stock} |
@@ -88,9 +115,12 @@ async function loadAllSheets() {
     }
   }
 
-  // Smooth finish
   progressStats.innerHTML += ` | ✔ All Sheets Loaded`;
 }
+
+/* =========================
+   BOOTSTRAP
+========================= */
 
 async function bootstrap() {
 
@@ -105,8 +135,10 @@ async function bootstrap() {
 
     wireGlobalSearch();
     wireExportButton();
+    wireSidebarToggle();
 
     console.log("App Ready");
+
   } catch (err) {
     console.error("Bootstrap failed:", err);
   }
