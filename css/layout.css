@@ -1,9 +1,7 @@
 body {
   background: var(--bg);
-  padding: 0;
   margin: 0;
   color: var(--text-dark);
-  font-family: sans-serif;
 }
 
 /* ================= HEADER ================= */
@@ -13,6 +11,7 @@ body {
   grid-template-columns: 1fr 2fr 1fr;
   align-items: center;
   padding: 20px 30px;
+  background: var(--bg);
 }
 
 .logo {
@@ -33,17 +32,13 @@ body {
 
 .progress-section {
   margin: 0 30px 20px 30px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   background: var(--card-bg);
   padding: 20px;
   border-radius: var(--border-radius);
   box-shadow: var(--shadow);
-}
-
-.progress-left {
-  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .progress-bar {
@@ -57,7 +52,6 @@ body {
 .progress-fill {
   height: 100%;
   background: var(--primary);
-  width: 0%;
   transition: width 0.3s ease;
 }
 
@@ -66,46 +60,32 @@ body {
   color: var(--text-light);
 }
 
-.progress-right {
-  width: 280px;
-  text-align: right;
-}
-
 /* ================= MAIN WRAPPER ================= */
 
 .main-wrapper {
   display: flex;
-  margin-top: 10px;
+  min-height: calc(100vh - 140px);
 }
 
 /* ================= SIDEBAR ================= */
 
 .sidebar {
   width: 220px;
-  min-width: 220px;
-  height: calc(100vh - 120px);
   background: #ffffff;
   border-right: 1px solid #e5e7eb;
-  padding-top: 20px;
   transition: width 0.3s ease;
   overflow: hidden;
 }
 
 .sidebar.collapsed {
   width: 65px;
-  min-width: 65px;
 }
 
 .sidebar-toggle {
-  text-align: center;
+  padding: 15px;
   cursor: pointer;
   font-size: 20px;
-  margin-bottom: 25px;
-  opacity: 0.7;
-}
-
-.sidebar-toggle:hover {
-  opacity: 1;
+  text-align: center;
 }
 
 .sidebar-item {
@@ -134,13 +114,11 @@ body {
 
 .sidebar .label {
   white-space: nowrap;
-  transition: opacity 0.2s ease;
 }
 
-/* Hide label when collapsed */
+/* Hide text when collapsed */
 .sidebar.collapsed .label {
-  opacity: 0;
-  pointer-events: none;
+  display: none;
 }
 
 /* ================= MAIN CONTENT ================= */
@@ -148,18 +126,5 @@ body {
 .main-content {
   flex: 1;
   padding: 0 30px 30px 30px;
-}
-
-/* ================= SUMMARY ================= */
-
-.summary-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-}
-
-/* ================= REPORT ================= */
-
-.report-section {
-  margin-top: 20px;
+  transition: margin-left 0.3s ease;
 }
