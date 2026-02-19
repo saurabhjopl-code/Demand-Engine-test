@@ -13,7 +13,46 @@ import { exportAllReports } from "../utils/export.utils.js";
 window.globalSearchTerm = "";
 
 /* =========================
-   GLOBAL SEARCH
+   SIDEBAR LOGIC
+========================= */
+
+function wireSidebar() {
+
+  const sidebar = document.getElementById("sidebar");
+  const toggleBtn = document.getElementById("sidebarToggle");
+  const items = document.querySelectorAll(".sidebar-item");
+
+  toggleBtn.addEventListener("click", () => {
+    sidebar.classList.toggle("collapsed");
+  });
+
+  items.forEach(item => {
+
+    item.addEventListener("click", () => {
+
+      items.forEach(i => i.classList.remove("active"));
+      item.classList.add("active");
+
+      const tab = item.dataset.tab;
+
+      const dashboardSection = document.getElementById("dashboardSection");
+      const reportSection = document.getElementById("reportSection");
+
+      if (tab === "dashboard") {
+        dashboardSection.style.display = "grid";
+        reportSection.style.display = "none";
+      } else {
+        dashboardSection.style.display = "none";
+        reportSection.style.display = "block";
+      }
+
+    });
+
+  });
+}
+
+/* =========================
+   SEARCH
 ========================= */
 
 function wireGlobalSearch() {
@@ -28,35 +67,16 @@ function wireGlobalSearch() {
 }
 
 /* =========================
-   EXPORT BUTTON
+   EXPORT
 ========================= */
 
 function wireExportButton() {
   const btn = document.querySelector(".btn-primary");
-
-  btn.addEventListener("click", () => {
-    exportAllReports();
-  });
+  btn.addEventListener("click", exportAllReports);
 }
 
 /* =========================
-   SIDEBAR TOGGLE
-========================= */
-
-function wireSidebarToggle() {
-
-  const sidebar = document.getElementById("sidebar");
-  const toggleBtn = document.getElementById("sidebarToggle");
-
-  if (!sidebar || !toggleBtn) return;
-
-  toggleBtn.addEventListener("click", () => {
-    sidebar.classList.toggle("collapsed");
-  });
-}
-
-/* =========================
-   LOAD SHEETS WITH LIVE PROGRESS
+   LOAD SHEETS
 ========================= */
 
 async function loadAllSheets() {
@@ -66,18 +86,6 @@ async function loadAllSheets() {
 
   let loaded = 0;
   const total = Object.keys(SHEETS).length;
-
-  const sheetCounts = {
-    sales: 0,
-    stock: 0,
-    styleStatus: 0,
-    saleDays: 0,
-    sizeCount: 0,
-    production: 0,
-    meterCalc: 0,
-    location: 0,
-    xMarkup: 0
-  };
 
   for (const key in SHEETS) {
 
@@ -89,33 +97,19 @@ async function loadAllSheets() {
       const parsed = parseCSV(text);
 
       dataStore[key] = parsed;
-      sheetCounts[key] = parsed.length;
 
       loaded++;
 
       const percent = Math.round((loaded / total) * 100);
-
       progressFill.style.width = `${percent}%`;
       progressFill.textContent = `${percent}%`;
-
-      progressStats.innerHTML = `
-        Sales: ${sheetCounts.sales} |
-        Stock: ${sheetCounts.stock} |
-        Style Status: ${sheetCounts.styleStatus} |
-        Sale Days: ${sheetCounts.saleDays} |
-        Size Count: ${sheetCounts.sizeCount} |
-        Production: ${sheetCounts.production} |
-        Meter Calc: ${sheetCounts.meterCalc} |
-        Location: ${sheetCounts.location} |
-        X Mark Up: ${sheetCounts.xMarkup}
-      `;
 
     } catch (err) {
       console.error("Sheet failed:", key, err);
     }
   }
 
-  progressStats.innerHTML += ` | ✔ All Sheets Loaded`;
+  progressStats.innerHTML = "✔ All Sheets Loaded";
 }
 
 /* =========================
@@ -124,24 +118,16 @@ async function loadAllSheets() {
 
 async function bootstrap() {
 
-  try {
+  await loadAllSheets();
 
-    await loadAllSheets();
+  buildCoreEngine();
+  buildAllSummaries();
+  renderAllSummaries();
+  renderAllReports();
 
-    buildCoreEngine();
-    buildAllSummaries();
-    renderAllSummaries();
-    renderAllReports();
-
-    wireGlobalSearch();
-    wireExportButton();
-    wireSidebarToggle();
-
-    console.log("App Ready");
-
-  } catch (err) {
-    console.error("Bootstrap failed:", err);
-  }
+  wireSidebar();
+  wireGlobalSearch();
+  wireExportButton();
 }
 
 bootstrap();
