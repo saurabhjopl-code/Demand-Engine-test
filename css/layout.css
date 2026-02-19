@@ -141,7 +141,11 @@ body {
   opacity: 1;
 }
 
-/* TOOLTIP */
+/* SIDEBAR TOOLTIP FIX */
+
+.sidebar {
+  overflow: visible; /* Important */
+}
 
 .sidebar-item {
   position: relative;
@@ -150,20 +154,23 @@ body {
 .sidebar-item::after {
   content: attr(data-title);
   position: absolute;
-  left: 60px;
+  left: 55px;              /* Slightly outside collapsed width */
   top: 50%;
   transform: translateY(-50%);
   background: #111827;
-  color: #fff;
-  padding: 6px 10px;
+  color: #ffffff;
+  padding: 6px 12px;
   border-radius: 6px;
   font-size: 12px;
   white-space: nowrap;
   opacity: 0;
   pointer-events: none;
-  transition: 0.2s;
+  transition: opacity 0.2s ease;
+  z-index: 9999;           /* Important */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
 .sidebar-item:hover::after {
   opacity: 1;
 }
+
