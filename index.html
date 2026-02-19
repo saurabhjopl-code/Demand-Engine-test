@@ -16,39 +16,8 @@
 </head>
 <body>
 
-<header class="app-header">
-  <div class="header-left">
-    <img src="./assets/logo.png" class="logo" />
-  </div>
-
-  <div class="header-center">
-    Demand Planning Engine
-  </div>
-
-  <div class="header-right">
-    <button class="btn-primary">Export</button>
-  </div>
-</header>
-
-<section class="progress-section">
-  <div class="progress-left">
-    <div class="progress-bar">
-      <div class="progress-fill"></div>
-    </div>
-
-    <div class="progress-stats"></div>
-  </div>
-
-  <div class="progress-right">
-    <input type="text" class="search-input" placeholder="Search Style / SKU..." />
-  </div>
-</section>
-
-<!-- MAIN LAYOUT -->
-<div class="main-layout">
-
   <!-- SIDEBAR -->
-<aside class="sidebar" id="sidebar">
+  <aside class="sidebar" id="sidebar">
 
     <div class="sidebar-toggle" id="sidebarToggle">☰</div>
 
@@ -104,44 +73,38 @@
 
   </aside>
 
+  <!-- MAIN CONTENT -->
+  <div class="main-content">
 
-  <!-- CONTENT -->
-  <div class="content-area">
-
-    <!-- SUMMARIES -->
-    <section class="summary-grid" id="dashboardSection">
-
-      <div class="card">
-        <div class="card-title">Sale Details</div>
-        <div class="card-body"></div>
+    <header class="app-header">
+      <div>
+        <img src="./assets/logo.png" class="logo" />
       </div>
 
-      <div class="card">
-        <div class="card-title">Current FC Stock</div>
-        <div class="card-body"></div>
+      <div class="header-center">
+        Demand Planning Engine
       </div>
 
-      <div class="card">
-        <div class="card-title">SC Band Summary</div>
-        <div class="card-body"></div>
+      <div class="header-right">
+        <button class="btn-primary">Export</button>
+      </div>
+    </header>
+
+    <section class="progress-section">
+      <div>
+        <div class="progress-bar">
+          <div class="progress-fill"></div>
+        </div>
+        <div class="progress-stats"></div>
       </div>
 
-      <div class="card">
-        <div class="card-title">Company Remark-wise Sale</div>
-        <div class="card-body"></div>
+      <div class="progress-right">
+        <input type="text" class="search-input" placeholder="Search Style / SKU..." />
       </div>
-
-      <div class="card">
-        <div class="card-title">Size-wise Analysis</div>
-        <div class="card-body"></div>
-      </div>
-
-      <div class="card">
-        <div class="card-title">Category-wise Sale</div>
-        <div class="card-body"></div>
-      </div>
-
     </section>
+
+    <!-- DASHBOARD -->
+    <section class="summary-grid" id="dashboardSection"></section>
 
     <!-- REPORT -->
     <section class="report-section" id="reportSection" style="display:none;">
@@ -152,14 +115,9 @@
     </section>
 
   </div>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
-<script type="module" src="./js/app/bootstrap.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+  <script type="module" src="./js/app/bootstrap.js"></script>
 
 </body>
 </html>
-
-
-
-
