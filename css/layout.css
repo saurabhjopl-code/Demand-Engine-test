@@ -236,3 +236,12 @@ body {
 .sidebar.collapsed .label {
   display: none;
 }
+
+.main-content {
+  margin-left: 220px;
+  transition: margin-left 0.3s ease;
+}
+
+.sidebar.collapsed ~ .main-content {
+  margin-left: 65px;
+}
