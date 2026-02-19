@@ -174,3 +174,7 @@ body {
   opacity: 1;
 }
 
+.sidebar.collapsed {
+  overflow: visible;
+}
+
