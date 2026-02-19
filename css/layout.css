@@ -66,3 +66,63 @@ body {
   width: 280px;
   text-align: right;
 }
+
+/* MAIN LAYOUT */
+
+.main-layout {
+  display: flex;
+  gap: 20px;
+}
+
+/* SIDEBAR */
+
+.sidebar {
+  width: 70px;
+  background: var(--card-bg);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 15px 0;
+  gap: 18px;
+  transition: all 0.3s ease;
+}
+
+.sidebar.collapsed {
+  width: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.sidebar-item {
+  font-size: 20px;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: 0.2s;
+}
+
+.sidebar-item:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.sidebar-item.active {
+  opacity: 1;
+}
+
+/* CONTENT AREA */
+
+.content-area {
+  flex: 1;
+}
+
+/* HAMBURGER */
+
+.hamburger {
+  font-size: 18px;
+  margin-right: 10px;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
