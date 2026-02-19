@@ -13,50 +13,13 @@ import { exportAllReports } from "../utils/export.utils.js";
 window.globalSearchTerm = "";
 
 /* =========================
-   SIDEBAR LOGIC
-========================= */
-
-function wireSidebar() {
-
-  const sidebar = document.getElementById("sidebar");
-  const toggleBtn = document.getElementById("sidebarToggle");
-  const items = document.querySelectorAll(".sidebar-item");
-
-  toggleBtn.addEventListener("click", () => {
-    sidebar.classList.toggle("collapsed");
-  });
-
-  items.forEach(item => {
-
-    item.addEventListener("click", () => {
-
-      items.forEach(i => i.classList.remove("active"));
-      item.classList.add("active");
-
-      const tab = item.dataset.tab;
-
-      const dashboardSection = document.getElementById("dashboardSection");
-      const reportSection = document.getElementById("reportSection");
-
-      if (tab === "dashboard") {
-        dashboardSection.style.display = "grid";
-        reportSection.style.display = "none";
-      } else {
-        dashboardSection.style.display = "none";
-        reportSection.style.display = "block";
-      }
-
-    });
-
-  });
-}
-
-/* =========================
-   SEARCH
+   GLOBAL SEARCH
 ========================= */
 
 function wireGlobalSearch() {
   const input = document.querySelector(".search-input");
+
+  if (!input) return;
 
   input.addEventListener("input", (e) => {
     window.globalSearchTerm = e.target.value;
@@ -67,12 +30,35 @@ function wireGlobalSearch() {
 }
 
 /* =========================
-   EXPORT
+   EXPORT BUTTON
 ========================= */
 
 function wireExportButton() {
   const btn = document.querySelector(".btn-primary");
-  btn.addEventListener("click", exportAllReports);
+  if (!btn) return;
+
+  btn.addEventListener("click", () => {
+    exportAllReports();
+  });
+}
+
+/* =========================
+   SIDEBAR TOGGLE (FIXED)
+========================= */
+
+function wireSidebarToggle() {
+
+  const sidebar = document.getElementById("sidebar");
+  const toggleBtn = document.getElementById("sidebarToggle");
+
+  if (!sidebar || !toggleBtn) {
+    console.warn("Sidebar elements not found");
+    return;
+  }
+
+  toggleBtn.addEventListener("click", () => {
+    sidebar.classList.toggle("collapsed");
+  });
 }
 
 /* =========================
@@ -87,29 +73,61 @@ async function loadAllSheets() {
   let loaded = 0;
   const total = Object.keys(SHEETS).length;
 
+  const sheetCounts = {
+    sales: 0,
+    stock: 0,
+    styleStatus: 0,
+    saleDays: 0,
+    sizeCount: 0,
+    production: 0,
+    meterCalc: 0,
+    location: 0,
+    xMarkup: 0
+  };
+
   for (const key in SHEETS) {
 
     try {
 
-      progressStats.innerHTML = `Loading: ${key}...`;
+      if (progressStats)
+        progressStats.innerHTML = `Loading: ${key}...`;
 
       const text = await fetchCSV(SHEETS[key]);
       const parsed = parseCSV(text);
 
       dataStore[key] = parsed;
+      sheetCounts[key] = parsed.length;
 
       loaded++;
 
       const percent = Math.round((loaded / total) * 100);
-      progressFill.style.width = `${percent}%`;
-      progressFill.textContent = `${percent}%`;
+
+      if (progressFill) {
+        progressFill.style.width = `${percent}%`;
+        progressFill.textContent = `${percent}%`;
+      }
+
+      if (progressStats) {
+        progressStats.innerHTML = `
+          Sales: ${sheetCounts.sales} |
+          Stock: ${sheetCounts.stock} |
+          Style Status: ${sheetCounts.styleStatus} |
+          Sale Days: ${sheetCounts.saleDays} |
+          Size Count: ${sheetCounts.sizeCount} |
+          Production: ${sheetCounts.production} |
+          Meter Calc: ${sheetCounts.meterCalc} |
+          Location: ${sheetCounts.location} |
+          X Mark Up: ${sheetCounts.xMarkup}
+        `;
+      }
 
     } catch (err) {
       console.error("Sheet failed:", key, err);
     }
   }
 
-  progressStats.innerHTML = "✔ All Sheets Loaded";
+  if (progressStats)
+    progressStats.innerHTML += ` | ✔ All Sheets Loaded`;
 }
 
 /* =========================
@@ -118,16 +136,24 @@ async function loadAllSheets() {
 
 async function bootstrap() {
 
-  await loadAllSheets();
+  try {
 
-  buildCoreEngine();
-  buildAllSummaries();
-  renderAllSummaries();
-  renderAllReports();
+    await loadAllSheets();
 
-  wireSidebar();
-  wireGlobalSearch();
-  wireExportButton();
+    buildCoreEngine();
+    buildAllSummaries();
+    renderAllSummaries();
+    renderAllReports();
+
+    wireGlobalSearch();
+    wireExportButton();
+    wireSidebarToggle();
+
+    console.log("App Ready");
+
+  } catch (err) {
+    console.error("Bootstrap failed:", err);
+  }
 }
 
 bootstrap();
